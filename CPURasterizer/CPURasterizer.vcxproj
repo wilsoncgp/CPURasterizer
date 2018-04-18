@@ -142,12 +142,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CPURasterizer.h" />
+    <ClInclude Include="Rasterizer.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CPURasterizer.cpp" />
+    <ClCompile Include="Rasterizer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
