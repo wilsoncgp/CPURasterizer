@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Rasterizer.h"
+#include "WMath.h"
 
 
 CRasterizer::CRasterizer()
@@ -52,7 +53,7 @@ void CRasterizer::DrawLine(int x1, int y1, int x2, int y2, COLORREF color)
 		bool right = dx > 0;
 		int xRight = right ? x2 : x1;
 		int xLeft = right ? x1 : x2;
-		float y = yTop;
+		int y = yTop;
 
 		float error = 0.0f;
 		for (int x = xLeft; x <= xRight; x++)
@@ -61,7 +62,7 @@ void CRasterizer::DrawLine(int x1, int y1, int x2, int y2, COLORREF color)
 			error += deltaErr;
 			while (error >= 0.5f)
 			{
-				y += Sign(dy);
+				y += WMath::Sign(dy);
 				error -= 1.0f;
 			}
 		}
@@ -77,9 +78,4 @@ void CRasterizer::DrawFilledSquare(int x, int y, int size, COLORREF color)
 			SetPixel(_hdc, i + x, j + y, color);
 		}
 	}
-}
-
-int CRasterizer::Sign(int x)
-{
-	return (x > 0) - (x < 0);
 }

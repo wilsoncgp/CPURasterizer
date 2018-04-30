@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\WMath">
+      <UniqueIdentifier>{2e68ad56-dd99-44bc-9bb6-24c5386adba1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\WMath">
+      <UniqueIdentifier>{32e20f8b-6d71-410d-afaa-1164f277c16b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\WMath\Datatypes">
+      <UniqueIdentifier>{dab34b08-b9f9-4d1a-a2fd-98fa231eb6af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\WMath\Datatypes">
+      <UniqueIdentifier>{ea1a9019-4617-4eab-8996-f25e27c07109}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -33,6 +45,18 @@
     <ClInclude Include="Rasterizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="WMath.h">
+      <Filter>Header Files\WMath</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector4D.h">
+      <Filter>Header Files\WMath\Datatypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3D.h">
+      <Filter>Header Files\WMath\Datatypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector2D.h">
+      <Filter>Header Files\WMath\Datatypes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -43,6 +67,18 @@
     </ClCompile>
     <ClCompile Include="Rasterizer.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WMath.cpp">
+      <Filter>Source Files\WMath</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector4D.cpp">
+      <Filter>Source Files\WMath\Datatypes</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector3D.cpp">
+      <Filter>Source Files\WMath\Datatypes</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector2D.cpp">
+      <Filter>Source Files\WMath\Datatypes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
