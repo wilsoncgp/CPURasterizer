@@ -228,6 +228,94 @@ void CRasterizer::DrawLine(int x1, int y1, int x2, int y2, COLORREF color)
 				}
 			}
 		}
+		// Example: We are in top-right octant
+		//	where y changes more than x
+		else if (!bottom && right && mGreaterThan1)
+		{
+			float deltaErr = fabs((float)dx / (float)dy);
+			float err = 0.0f;
+
+			int yStart = y2;
+			int yEnd = y1;
+			int x = x2;
+			for (int y = yStart; y <= yEnd; y++)
+			{
+				SetPixel(_hdc, x, y, color);
+
+				err += deltaErr;
+				if (err >= 1.0f)
+				{
+					x--;
+					err -= 1.0f;
+				}
+			}
+		}
+		// Example: We are in top-right octant
+		//	where x changes more than y
+		else if (!bottom && right && !mGreaterThan1)
+		{
+			float deltaErr = mAbs;
+			float err = 0.0f;
+
+			int xStart = x1;
+			int xEnd = x2;
+			int y = y1;
+			for (int x = xStart; x <= xEnd; x++)
+			{
+				SetPixel(_hdc, x, y, color);
+
+				err += deltaErr;
+				if (err >= 1.0f)
+				{
+					y--;
+					err -= 1.0f;
+				}
+			}
+		}
+		// Example: We are in the top-left octant
+		//	where y changes more than x
+		else if (!bottom && !right && mGreaterThan1)
+		{
+			float deltaErr = fabs((float)dx / (float)dy);
+			float err = 0.0f;
+
+			int yStart = y2;
+			int yEnd = y1;
+			int x = x2;
+			for (int y = yStart; y <= yEnd; y++)
+			{
+				SetPixel(_hdc, x, y, color);
+
+				err += deltaErr;
+				if (err >= 1.0f)
+				{
+					x++;
+					err -= 1.0f;
+				}
+			}
+		}
+		// Example: We are in the top-left octant
+		//	where x changes more than y
+		else if (!bottom && !right && !mGreaterThan1)
+		{
+			float deltaErr = mAbs;
+			float err = 0.0f;
+
+			int xStart = x2;
+			int xEnd = x1;
+			int y = y2;
+			for (int x = xStart; x <= xEnd; x++)
+			{
+				SetPixel(_hdc, x, y, color);
+
+				err += deltaErr;
+				if (err >= 1.0f)
+				{
+					y++;
+					err -= 1.0f;
+				}
+			}
+		}
 	}
 }
 
