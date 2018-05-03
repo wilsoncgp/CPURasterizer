@@ -22,13 +22,13 @@ float WMath::Dot(CVector4D v1, CVector4D v2)
 			(v1.GetW() * v2.GetW());
 }
 
-static float Cross(CVector2D v1, CVector2D v2)
+float WMath::Cross(CVector2D v1, CVector2D v2)
 {
 	return	(v1.GetX() * v2.GetY()) -
 			(v1.GetY() * v2.GetX());
 }
 
-static CVector3D Cross(CVector3D v1, CVector3D v2)
+CVector3D WMath::Cross(CVector3D v1, CVector3D v2)
 {
 	return CVector3D(
 		((v1.GetY() * v2.GetZ()) - (v1.GetZ() * v2.GetY())),
@@ -38,7 +38,7 @@ static CVector3D Cross(CVector3D v1, CVector3D v2)
 
 //NOTE: 4D cross product provided is simply 3D cross product with W.
 // With it being cross product, W is provided as zero to signify a direction.
-static CVector4D Cross(CVector4D v1, CVector4D v2)
+CVector4D WMath::Cross(CVector4D v1, CVector4D v2)
 {
 	return CVector4D(Cross(CVector3D(v1), CVector3D(v2)), 0.0f);
 }

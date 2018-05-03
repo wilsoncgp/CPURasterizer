@@ -57,6 +57,15 @@
     <ClInclude Include="Vector2D.h">
       <Filter>Header Files\WMath\Datatypes</Filter>
     </ClInclude>
+    <ClInclude Include="Matrix2D.h">
+      <Filter>Header Files\WMath\Datatypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix3D.h">
+      <Filter>Header Files\WMath\Datatypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix4D.h">
+      <Filter>Header Files\WMath\Datatypes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -78,6 +87,15 @@
       <Filter>Source Files\WMath\Datatypes</Filter>
     </ClCompile>
     <ClCompile Include="Vector2D.cpp">
+      <Filter>Source Files\WMath\Datatypes</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrix2D.cpp">
+      <Filter>Source Files\WMath\Datatypes</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrix3D.cpp">
+      <Filter>Source Files\WMath\Datatypes</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrix4D.cpp">
       <Filter>Source Files\WMath\Datatypes</Filter>
     </ClCompile>
   </ItemGroup>
