@@ -107,9 +107,6 @@ void CRasterizer::DrawLine(int x1, int y1, int x2, int y2, COLORREF color)
 	// Diagonal line, x changes exact same time as y
 	else if (abs(dy) == abs(dx))
 	{
-		/*int xStart = dx > 0 ? x1 : x2;
-		int xEnd = dx > 0 ? x2 : x1;
-		int yStart = dx > 0 ? y1 : y2;*/
 		int xStart = x1;
 		int xEnd = x2;
 		int yStart = y1;
@@ -140,181 +137,34 @@ void CRasterizer::DrawLine(int x1, int y1, int x2, int y2, COLORREF color)
 		// if m > 1, we're in the octant where y changes more than x
 		bool mGreaterThan1 = mAbs > 1.0f;
 
-		// Example: We are in bottom-right octant
-		//	where y changes more than x
-		if (bottom && right && mGreaterThan1)
+		// If m > 1:
+		//	- The delta error is dx/dy.
+		//	- Y moves from start to end by 1 each loop.
+		// If m < 1:
+		//	- The delta error is dy/dx.
+		//	- X moves from start to end by 1 each loop.
+		float deltaErr = mGreaterThan1 ? fabs((float)dx / (float)dy) : mAbs;
+		float err = 0.0f;
+
+		int start = mGreaterThan1 ? y1 : x1;
+		int end = mGreaterThan1 ? y2 : x2;
+		int val1 = mGreaterThan1 ? x1 : y1;
+		int val2 = start;
+		while (val2 != end)
 		{
-			float deltaErr = fabs((float)dx / (float)dy);
-			float err = 0.0f;
+			SetPixel(_hdc,
+				mGreaterThan1 ? val1 : val2,
+				mGreaterThan1 ? val2 : val1,
+				color);
 
-			int yStart = y1;
-			int yEnd = y2;
-			int x = x1;
-			for (int y = yStart; y <= yEnd; y++)
+			err += deltaErr;
+			if (err >= 1.0f)
 			{
-				SetPixel(_hdc, x, y, color);
-
-				err += deltaErr;
-				if (err >= 1.0f)
-				{
-					x++;
-					err -= 1.0f;
-				}
+				val1 += WMath::Sign(mGreaterThan1 ? dx : dy);
+				err -= 1.0f;
 			}
-		}
-		// Example: We are in bottom-right octant
-		//	where x changes more than y
-		else if (bottom && right && !mGreaterThan1)
-		{
-			float deltaErr = mAbs;
-			float err = 0.0f;
 
-			int xStart = x1;
-			int xEnd = x2;
-			int y = y1;
-			for (int x = xStart; x <= xEnd; x++)
-			{
-				SetPixel(_hdc, x, y, color);
-
-				err += deltaErr;
-				if (err >= 1.0f)
-				{
-					y++;
-					err -= 1.0f;
-				}
-			}
-		}
-		// Example: We are in bottom-left octant
-		//	where y changes more than x
-		else if (bottom & !right && mGreaterThan1)
-		{
-			float deltaErr = fabs((float)dx / (float)dy);
-			float err = 0.0f;
-
-			int yStart = y1;
-			int yEnd = y2;
-			int x = x1;
-			for (int y = yStart; y <= yEnd; y++)
-			{
-				SetPixel(_hdc, x, y, color);
-
-				err += deltaErr;
-				if (err >= 1.0f)
-				{
-					x--;
-					err -= 1.0f;
-				}
-			}
-		}
-		// Example: We are in bottom-left octant
-		//	where x changes more than y
-		else if (bottom & !right && !mGreaterThan1)
-		{
-			float deltaErr = mAbs;
-			float err = 0.0f;
-
-			int xStart = x2;
-			int xEnd = x1;
-			int y = y2;
-			for (int x = xStart; x <= xEnd; x++)
-			{
-				SetPixel(_hdc, x, y, color);
-
-				err += deltaErr;
-				if (err >= 1.0f)
-				{
-					y--;
-					err -= 1.0f;
-				}
-			}
-		}
-		// Example: We are in top-right octant
-		//	where y changes more than x
-		else if (!bottom && right && mGreaterThan1)
-		{
-			float deltaErr = fabs((float)dx / (float)dy);
-			float err = 0.0f;
-
-			int yStart = y2;
-			int yEnd = y1;
-			int x = x2;
-			for (int y = yStart; y <= yEnd; y++)
-			{
-				SetPixel(_hdc, x, y, color);
-
-				err += deltaErr;
-				if (err >= 1.0f)
-				{
-					x--;
-					err -= 1.0f;
-				}
-			}
-		}
-		// Example: We are in top-right octant
-		//	where x changes more than y
-		else if (!bottom && right && !mGreaterThan1)
-		{
-			float deltaErr = mAbs;
-			float err = 0.0f;
-
-			int xStart = x1;
-			int xEnd = x2;
-			int y = y1;
-			for (int x = xStart; x <= xEnd; x++)
-			{
-				SetPixel(_hdc, x, y, color);
-
-				err += deltaErr;
-				if (err >= 1.0f)
-				{
-					y--;
-					err -= 1.0f;
-				}
-			}
-		}
-		// Example: We are in the top-left octant
-		//	where y changes more than x
-		else if (!bottom && !right && mGreaterThan1)
-		{
-			float deltaErr = fabs((float)dx / (float)dy);
-			float err = 0.0f;
-
-			int yStart = y2;
-			int yEnd = y1;
-			int x = x2;
-			for (int y = yStart; y <= yEnd; y++)
-			{
-				SetPixel(_hdc, x, y, color);
-
-				err += deltaErr;
-				if (err >= 1.0f)
-				{
-					x++;
-					err -= 1.0f;
-				}
-			}
-		}
-		// Example: We are in the top-left octant
-		//	where x changes more than y
-		else if (!bottom && !right && !mGreaterThan1)
-		{
-			float deltaErr = mAbs;
-			float err = 0.0f;
-
-			int xStart = x2;
-			int xEnd = x1;
-			int y = y2;
-			for (int x = xStart; x <= xEnd; x++)
-			{
-				SetPixel(_hdc, x, y, color);
-
-				err += deltaErr;
-				if (err >= 1.0f)
-				{
-					y++;
-					err -= 1.0f;
-				}
-			}
+			val2 += WMath::Sign(mGreaterThan1 ? dy : dx);
 		}
 	}
 }
