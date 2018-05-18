@@ -1,31 +1,40 @@
 #include "stdafx.h"
 #include "Rasterizer.h"
 #include "WMath.h"
+#include <stdint.h>
 
+typedef uint8_t uint8;
+typedef uint32_t uint32;
+typedef uint16_t uint16;
+typedef uint64_t uint64;
+
+const int BytesPerPixel = 4;
 
 CRasterizer::CRasterizer()
 {
+	_xOffset = 0;
 }
-
 
 CRasterizer::~CRasterizer()
 {
+	if (_bitmapMemory)
+	{
+		VirtualFree(_bitmapMemory, NULL, MEM_RELEASE);
+	}
 }
 
-void CRasterizer::BeginPaint(HDC hdc)
+void CRasterizer::Update()
 {
-	_hdc = hdc;
-}
-
-void CRasterizer::EndPaint()
-{
-	_hdc = nullptr;
+	_xOffset++;
 }
 
 void CRasterizer::Draw()
 {
+	ClearToColor(0, 128, 0);
+	//DrawWeirdGradient(0, 0);
+#pragma region OldDrawCode
 	// Draw blue filled square
-	DrawFilledSquare(100, 100, 50, RGB(0, 0, 255));
+	DrawFilledSquare(_xOffset + 100, 100, 50, RGB(0, 0, 255));
 
 	// Draw lines showing all horizontal, vertical, diagonal and all octants
 	// Horizontal left
@@ -60,6 +69,37 @@ void CRasterizer::Draw()
 	DrawLine(400, 300, 200, 500, RGB(255, 0, 0));
 	// Octant bottom-left-left
 	DrawLine(400, 300, 200, 400, RGB(255, 0, 0));
+#pragma endregion
+}
+
+void CRasterizer::ClearToColor(int r, int g, int b)
+{
+	int pitch = _bitmapInfo.bmiHeader.biWidth * BytesPerPixel;
+	uint8* row = (uint8*)_bitmapMemory;
+	for (int y = 0; y < _bitmapInfo.bmiHeader.biHeight; y++)
+	{
+		uint32* pixel = (uint32*)row;
+		for (int x = 0; x < _bitmapInfo.bmiHeader.biWidth; x++)
+		{
+			uint8 red = (uint8)r;
+			uint8 green = (uint8)g;
+			uint8 blue = (uint8)b;
+			uint8 alpha = 0;
+
+			*pixel++ = ((alpha << 24) | (red << 16) | (green << 8) | blue);
+		}
+
+		row += pitch;
+	}
+}
+
+void CRasterizer::DrawPixel(int x, int y, int r, int g, int b)
+{
+	int pitch = _bitmapInfo.bmiHeader.biWidth * BytesPerPixel;
+
+	uint8* row = ((uint8*)_bitmapMemory) + (pitch * y);
+	uint32* pixel = ((uint32*)row) + x;
+	*pixel = ((255 << 24) | (r << 16) | (g << 8) | b);
 }
 
 void CRasterizer::DrawLine(int x1, int y1, int x2, int y2, COLORREF color)
@@ -80,7 +120,8 @@ void CRasterizer::DrawLine(int x1, int y1, int x2, int y2, COLORREF color)
 	// Both points are the same, just set one pixel
 	if (dx == 0 && dy == 0)
 	{
-		SetPixel(_hdc, x1, y1, color);
+		//SetPixel(_hdc, x1, y1, color);
+		DrawPixel(x1, y1, GetRValue(color), GetGValue(color), GetBValue(color));
 	}
 	// Horizontal line, y stays the same
 	else if (dy == 0)
@@ -90,7 +131,8 @@ void CRasterizer::DrawLine(int x1, int y1, int x2, int y2, COLORREF color)
 
 		for (int x = xStart; x <= xEnd; x++)
 		{
-			SetPixel(_hdc, x, y1, color);
+			//SetPixel(_hdc, x, y1, color);
+			DrawPixel(x, y1, GetRValue(color), GetGValue(color), GetBValue(color));
 		}
 	}
 	// Vertical line, x stays the same
@@ -101,7 +143,8 @@ void CRasterizer::DrawLine(int x1, int y1, int x2, int y2, COLORREF color)
 
 		for (int y = yStart; y <= yEnd; y++)
 		{
-			SetPixel(_hdc, x1, y, color);
+			//SetPixel(_hdc, x1, y, color);
+			DrawPixel(x1, y, GetRValue(color), GetGValue(color), GetBValue(color));
 		}
 	}
 	// Diagonal line, x changes exact same time as y
@@ -117,7 +160,8 @@ void CRasterizer::DrawLine(int x1, int y1, int x2, int y2, COLORREF color)
 		{
 			int x = xStart + (i * WMath::Sign(dx));
 			int y = yStart + (i * WMath::Sign(dy));
-			SetPixel(_hdc, x, y, color);
+			//SetPixel(_hdc, x, y, color);
+			DrawPixel(x, y, GetRValue(color), GetGValue(color), GetBValue(color));
 		}
 	}
 	// Within one of the octants
@@ -152,10 +196,13 @@ void CRasterizer::DrawLine(int x1, int y1, int x2, int y2, COLORREF color)
 		int val2 = start;
 		while (val2 != end)
 		{
-			SetPixel(_hdc,
+			/*SetPixel(_hdc,
 				mGreaterThan1 ? val1 : val2,
 				mGreaterThan1 ? val2 : val1,
-				color);
+				color);*/
+			int x = mGreaterThan1 ? val1 : val2;
+			int y = mGreaterThan1 ? val2 : val1;
+			DrawPixel(x, y, GetRValue(color), GetGValue(color), GetBValue(color));
 
 			err += deltaErr;
 			if (err >= 1.0f)
@@ -175,7 +222,60 @@ void CRasterizer::DrawFilledSquare(int x, int y, int size, COLORREF color)
 	{
 		for (int j = 0; j < size; j++)
 		{
-			SetPixel(_hdc, i + x, j + y, color);
+			//SetPixel(_hdc, i + x, j + y, color);
+			DrawPixel(i + x, j + y, GetRValue(color), GetGValue(color), GetBValue(color));
 		}
 	}
+}
+
+void CRasterizer::DrawWeirdGradient(int blueGradient, int greenGradient)
+{
+	int pitch = _bitmapInfo.bmiHeader.biWidth * BytesPerPixel;
+	uint8* row = (uint8*)_bitmapMemory;
+	for (int y = 0; y < _bitmapInfo.bmiHeader.biHeight; y++)
+	{
+		uint32* pixel = (uint32*)row;
+		for (int x = 0; x < _bitmapInfo.bmiHeader.biWidth; x++)
+		{
+			//uint8 r = (uint8)0;
+			uint8 g = (uint8)y;
+			uint8 b = (uint8)x;
+			//uint8 a = 0;
+
+			*pixel++ = (/*(a << 24) | (r << 16) | */(g << 8) | b);
+		}
+
+		row += pitch;
+	}
+}
+
+void CRasterizer::ResizeDIBSection(int width, int height)
+{
+	if (_bitmapMemory)
+	{
+		VirtualFree(_bitmapMemory, NULL, MEM_RELEASE);
+	}
+
+	_bitmapInfo.bmiHeader.biSize = sizeof(_bitmapInfo.bmiHeader);
+	_bitmapInfo.bmiHeader.biWidth = width;
+	_bitmapInfo.bmiHeader.biHeight = height;
+	_bitmapInfo.bmiHeader.biPlanes = 1;
+	_bitmapInfo.bmiHeader.biBitCount = 32;
+	_bitmapInfo.bmiHeader.biCompression = BI_RGB;
+
+	int bitmapMemorySize = (width * height) * BytesPerPixel;
+	_bitmapMemory = VirtualAlloc(NULL, bitmapMemorySize, MEM_COMMIT, PAGE_READWRITE);
+}
+
+void CRasterizer::UpdateWindow(HDC hdc, RECT* windowRect, int x, int y, int width, int height)
+{
+	int windowWidth = windowRect->right - windowRect->left;
+	int windowHeight = windowRect->bottom - windowRect->top;
+	StretchDIBits(
+		hdc,
+		0, 0, _bitmapInfo.bmiHeader.biWidth, _bitmapInfo.bmiHeader.biHeight,
+		0, 0, windowWidth, windowHeight,
+		_bitmapMemory,
+		&_bitmapInfo,
+		DIB_RGB_COLORS, SRCCOPY);
 }
